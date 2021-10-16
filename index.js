@@ -109,6 +109,8 @@ async function scrapInfo(page){
   const shippingStatus = await page.$eval(".lvshipping", el => el.innerText);
   console.log(shippingStatus);
 
+  // 🎯 TODO: click on the link and scrap further info, e.g. Condition
+
   // Give it some time to collect and store the data
   storeInDatabase(productName, ownedState, price, priceBeforeDiscount, shippingStatus);
   await page.waitForTimeout(2000)
