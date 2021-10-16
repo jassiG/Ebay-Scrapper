@@ -1,0 +1,21 @@
+run "node renre_cookies.js" and let it take ou to the login screen, 
+you will have 35 seconds to solve captcha and enter the login info.
+after this time, it will take a memory screenshot and save the cookies in state.json file.
+
+Now you need to run "node inde.js" for scrapping.
+currently this process does not return anything so you have to press 
+ctrl + C to halt the process.
+
+
+################# Bits from the sheet for quick lookup #######################
+every results is contained in result tile after advanced search:		
+result tile			.sresult	
+
+Result tile contains these terms:		
+thumbnail		.lvpic .img .left	
+name			.lvtitle	
+owned state		.lvsubtitle	
+star rating		-	
+price			.lvprices > .lvprice	
+price before cost reduction	.lvprices > .stk-thr		store it if it exists
+shipping status		.lvshipping		store it if it exists
