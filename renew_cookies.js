@@ -18,19 +18,25 @@ async function getCookies(browser){
   console.log("waiting over.")
   // Save cookies
   await context.storageState({ path: 'state.json' });
+  console.log("Cookies Storage Done Successfully!")
 }
 
 
 async function main() {
-  
+  // 🎯 TODO: Add Cookie Backup Functionality to keep previous data in a folder
+  // backupCurrentCookie(); 
   const browser = await firefox.launch({
     headless: false
   });
-  getCookies(browser);
+  await getCookies(browser);
+  await sleep(5000);
   return 0;
 }
 
-main().then( (result) =>
-  {
-  }
-);
+main();
+
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
