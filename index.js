@@ -129,6 +129,7 @@ async function getProducts(browser, searchTerm){
   console.log("Going to click worldwide...")
   await page.click('text=Worldwide')
   scrapInfo(page).then( () => context.close());
+  
 }
 
 
@@ -142,11 +143,22 @@ async function main() {
   prices = csvHeader;
   writeFile(prices);
   
-  for (let searchTerm of searchData)
-  {
-    await getProducts(browser, searchTerm);
-  }
+  async function temp(searchData, browser){
+    for (let searchTerm of searchData)
+    {
+      await getProducts(browser, searchTerm);
+    }
+    await sleep(2000);
+  } 
+  temp(searchData, browser).then( ()=> process.exit())
   return 0;
 }
 
 main();
+
+// Helper function to make the program wait for data storage
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
