@@ -4,7 +4,7 @@ const ObjectsToCsv = require('objects-to-csv');
 const replaceFirstLineOfFile = require('file-firstline-replace');
 
 let searchData;
-let csvHeader = "Product Name, Owned State, Product Price, Price Before Discount, Shipping Status, Ebay Item Number";
+let csvHeader = "Product Name, Owned State, Product Price, Price Before Discount, Shipping Status, Ebay Item Number, Dynamic Stats\n";
 
 /****************
      
@@ -49,17 +49,21 @@ function writeFile(str){
       }
   })
 }
-
+//“
 function storeInDatabase(args){
   console.log("Finally Storing in Databse...");
   let csvLine = "";
   csvLine += args[0];
   //Regex to remove commas in prices
   const search = ',';
-  const replacer = new RegExp(search, 'g');
+  const replacer1 = new RegExp(search, 'g');
+  const replacer2 = new RegExp('“', 'g');
+  const replacer3 = new RegExp('”', 'g');
   const replacingChar = '';
   for (let i=0; i<args.length; i++){
-    args[i] = args[i].replace( replacer, replacingChar);
+    args[i] = args[i].replace( replacer1, replacingChar);
+    args[i] = args[i].replace( replacer2, replacingChar);
+    args[i] = args[i].replace( replacer3, replacingChar);
     if (i >= 1){
       csvLine = csvLine + ", " + args[i];
     }
@@ -83,9 +87,8 @@ function storeInDatabase(args){
 ❌ starRating   👈 I don't think we need this for now
 
 ****************************************/
-async function modifyCsvHeader(){
+async function modifyCsvHeader(newHeader){
   var filename = "output.csv";
-  var newHeader = csvHeader;
   replaceFirstLineOfFile(filename, newHeader, function(err) {
     if (err) throw err;
   })
@@ -122,20 +125,30 @@ async function getMoreInfo(page, data){
       }
       return values;
   });
-  data.push(...itemValues);
+  let newHeader = csvHeader;
+  let joinedData = [];
+  for (let i=0; i<itemValues.length; i++){
+    let temp = "";
+    temp += itemLabels[i];
+    temp += " "
+    temp += itemValues[i];
+    temp += ", ";
+    joinedData.push(temp);
+  }
+  data.push(...joinedData);
   for (let i = 0; i < itemLabels.length; i++){
     //console.log(itemLabels[i] + " " + itemValues[i]);
-    csvHeader = csvHeader + ", " + itemLabels[i];
+    newHeader = newHeader + ", " + itemLabels[i];
   }
-  csvHeader += "\n";
-  await modifyCsvHeader();
+  newHeader += "\n";
+  //await modifyCsvHeader(newHeader);
   await page.waitForTimeout(1000);
   storeInDatabase(data);
   // Give the page some time
   await page.waitForTimeout(4000);
 }
 
-async function scrapInfo(page){
+async function scrapInfo(context, page){
   let dataToStore = [];
   // Scrap data according to the sheet
   
@@ -187,7 +200,7 @@ async function getProducts(browser, searchTerm){
   await page.waitForSelector('text=Worldwide');
   console.log("Going to click worldwide...");
   await page.click('text=Worldwide');
-  scrapInfo(page);
+  scrapInfo(context, page);
 }
 
 
@@ -205,7 +218,7 @@ async function main() {
     {
       await getProducts(browser, searchTerm);
     }
-    await sleep(5000);
+    await sleep(15000);
   } 
   temp(searchData, browser).then( ()=> process.exit());
   return 0;
